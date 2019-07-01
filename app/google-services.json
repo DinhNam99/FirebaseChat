@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "772503155112",
+    "firebase_url": "https://fir-chat-a04e6.firebaseio.com",
+    "project_id": "fir-chat-a04e6",
+    "storage_bucket": "fir-chat-a04e6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:772503155112:android:f20b952daef71414",
+        "android_client_info": {
+          "package_name": "com.dell.firebasechat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "772503155112-nbs0hoptkbm9vd26ba61vo8dpuea0hta.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dell.firebasechat",
+            "certificate_hash": "77c347e2c1d6c4575a0a608ea94856606fed9d79"
+          }
+        },
+        {
+          "client_id": "772503155112-mgduuhoddsttgf69httuff4d3jh3er2c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUx2mS2Ucl8mH_enCwHIAxWsL7kmW3JaI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "772503155112-mgduuhoddsttgf69httuff4d3jh3er2c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
