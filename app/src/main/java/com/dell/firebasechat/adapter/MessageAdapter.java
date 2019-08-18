@@ -10,11 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.dell.firebasechat.R;
 import com.dell.firebasechat.model.Message;
 import com.google.firebase.auth.FirebaseAuth;
@@ -71,19 +68,83 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 format(new java.util.Date(timestampString));
         holder.tvTime.setText(value);
 
-       Log.e("Position", position+"");
+        Log.e("Position", position+"");
 
-      if(position>0) {
-          if (Long.parseLong(chatsList.get(position).getTime()) - Long.parseLong(chatsList.get(position - 1).getTime()) <= 8000) {
-              if (holder.getItemViewType() == TYPE_RECEIVER) {
-                  holder.imageFriend.setVisibility(View.INVISIBLE);
-                  holder.tvMess.setBackgroundResource(R.drawable.draw_chat_left2);
-              } else if (holder.getItemViewType() == TYPE_SENDER) {
-                  holder.tvMess.setBackgroundResource(R.drawable.draw_chat_rigth2);
-              }
-          }
+        Message message = chatsList.get(position);
+        if(position == 0 && position == chatsList.size()-1){
+            if (holder.getItemViewType() == TYPE_RECEIVER) {
+                holder.tvMess.setBackgroundResource(R.drawable.draw_chat_left4);
+            } else if (holder.getItemViewType() == TYPE_SENDER) {
+                holder.tvMess.setBackgroundResource(R.drawable.draw_chat_rigth4);
+            }
+        }
+        if(position == 0){
+            if(position+1<chatsList.size()){
+                Message message1 = chatsList.get(position+1);
+                if(message1.getSender().equals(message.getSender()) && message1.getReceiver().equals(message.getReceiver())){
+                    if(checkTime(message.getTime(),message1.getTime())){
+                        changeHolder(holder,R.drawable.draw_chat_left,R.drawable.draw_chat_rigth);
+                    }else{
+                        changeHolder2(holder,R.drawable.draw_chat_left4,R.drawable.draw_chat_rigth4);
+                    }
+                }else{
+                    changeHolder2(holder,R.drawable.draw_chat_left4,R.drawable.draw_chat_rigth4);
+                }
+            }
+        }
+        if(position == 1){
+            if(position>0){
+                Message message_1 = chatsList.get(position-1);
+                if(message_1.getSender().equals(message.getSender()) && message_1.getReceiver().equals(message.getReceiver())){
+                    if(checkTime(message.getTime(),message_1.getTime())){
+                        changeHolder2(holder,R.drawable.draw_chat_left2,R.drawable.draw_chat_rigth2);
+                    }
+                }
+            }
+        }
+        if(position == chatsList.size()-1&& position>0){
+            Message message_1 = chatsList.get(position-1);
+            if(message_1.getSender().equals(message.getSender()) && message_1.getReceiver().equals(message.getReceiver())){
+                if(checkTime(message.getTime(),message_1.getTime())){
+                    changeHolder(holder,R.drawable.draw_chat_left2,R.drawable.draw_chat_rigth2);
+                }
+            }
+        }
 
-      }
+        if(position!=chatsList.size()-1){
+            if(position+1<chatsList.size() && position-1>=0){
+                Message message_1 = chatsList.get(position-1);
+                Message message1 = chatsList.get(position+1);
+                if((message1.getSender().equals(message.getSender()) && message1.getReceiver().equals(message.getReceiver())) && (!message_1.getSender().equals(message.getSender()) && !message_1.getReceiver().equals(message.getReceiver()))){
+                    if(checkTime(message1.getTime(),message.getTime())){
+                        changeHolder(holder,R.drawable.draw_chat_left,R.drawable.draw_chat_rigth);
+                    }else {
+                        changeHolder(holder,R.drawable.draw_chat_left4,R.drawable.draw_chat_rigth4);
+                    }
+                }
+                if((!message1.getSender().equals(message.getSender()) && !message1.getReceiver().equals(message.getReceiver())) && (message_1.getSender().equals(message.getSender()) && message_1.getReceiver().equals(message.getReceiver()))){
+                    if(checkTime(message.getTime(),message_1.getTime())){
+                        changeHolder2(holder,R.drawable.draw_chat_left2,R.drawable.draw_chat_rigth2);
+                    }
+                }
+                if((message1.getSender().equals(message.getSender()) && message1.getReceiver().equals(message.getReceiver())) && (message_1.getSender().equals(message.getSender()) && message_1.getReceiver().equals(message.getReceiver()))){
+                    if(Long.parseLong(message.getTime())-Long.parseLong(message_1.getTime())>8000 && checkTime(message1.getTime(),message.getTime())){
+                        changeHolder2(holder,R.drawable.draw_chat_left,R.drawable.draw_chat_rigth);
+                    }
+                    if(Long.parseLong(message1.getTime())-Long.parseLong(message.getTime())>8000 && checkTime(message.getTime(),message_1.getTime())){
+                        changeHolder(holder,R.drawable.draw_chat_left2,R.drawable.draw_chat_rigth2);
+                    }
+                    if(Long.parseLong(message.getTime())-Long.parseLong(message_1.getTime())>8000 && Long.parseLong(message1.getTime())-Long.parseLong(message.getTime())>8000){
+
+                        changeHolder(holder,R.drawable.draw_chat_left4,R.drawable.draw_chat_rigth4);
+                    }
+                    if(checkTime(message.getTime(),message_1.getTime()) && checkTime(message1.getTime(),message.getTime())){
+                        changeHolder(holder,R.drawable.draw_chat_left3,R.drawable.draw_chat_rigth3);
+                    }
+                }
+            }
+        }
+
         //seen
         if(position == chatsList.size()-1){
             if(chatsList.get(position).isSeen()){
@@ -110,6 +171,27 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     @Override
     public int getItemCount() {
         return chatsList.size();
+    }
+
+    public void changeHolder (MessageViewHolder holder, int t1, int t2){
+            if (holder.getItemViewType() == TYPE_RECEIVER) {
+                holder.imageFriend.setVisibility(View.INVISIBLE);
+                holder.tvMess.setBackgroundResource(t1);
+            } else if (holder.getItemViewType() == TYPE_SENDER) {
+                holder.tvMess.setBackgroundResource(t2);
+            }
+    }
+    public void changeHolder2 (MessageViewHolder holder, int t1, int t2){
+        if (holder.getItemViewType() == TYPE_RECEIVER) {
+            holder.tvMess.setBackgroundResource(t1);
+        } else if (holder.getItemViewType() == TYPE_SENDER) {
+            holder.tvMess.setBackgroundResource(t2);
+        }
+    }
+
+    public boolean checkTime(String t1, String t2){
+        if(Long.parseLong(t1)-Long.parseLong(t2)<=8000) return true;
+        return false;
     }
 
     class MessageViewHolder extends RecyclerView.ViewHolder {
@@ -144,5 +226,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         return position;
     }
 
+    public void removeItem(int position) {
+        chatsList.remove(position);
+        notifyItemRemoved(position);
+        notifyItemRangeChanged(position, chatsList.size());
+    }
 }
 

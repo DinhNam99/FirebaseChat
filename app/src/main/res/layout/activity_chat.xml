@@ -83,7 +83,5 @@
             android:layout_alignParentRight="true"
             android:background="@drawable/ic_send"
             />
-
     </RelativeLayout>
-
 </RelativeLayout>

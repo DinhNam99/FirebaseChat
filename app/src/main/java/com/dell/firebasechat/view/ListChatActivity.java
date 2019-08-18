@@ -1,10 +1,22 @@
 package com.dell.firebasechat.view;
 
+import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.RectF;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,9 +28,12 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.dell.firebasechat.R;
 import com.dell.firebasechat.adapter.UsersAdapter;
+
+import com.dell.firebasechat.model.UIActionClass;
 import com.dell.firebasechat.model.User;
 
 import com.facebook.login.LoginManager;
@@ -29,10 +44,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseException;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.iid.FirebaseInstanceId;
+
 
 import java.util.ArrayList;
 
@@ -42,9 +58,10 @@ public class ListChatActivity extends AppCompatActivity implements SearchView.On
 
     SearchView searchView;
     CircleImageView imageUser;
-    ArrayList<User> userArrayList = new ArrayList<>();
+    public static ArrayList<User> userArrayList = new ArrayList<>();
     RecyclerView rcUser;
     UsersAdapter adapter;
+    String username;
 
     DatabaseReference reference;
 
@@ -70,38 +87,11 @@ public class ListChatActivity extends AppCompatActivity implements SearchView.On
         //deleteuser
         removeUser();
 
+
         imageUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(ListChatActivity.this);
-                builder.setTitle("Do you want to log out ?");
-                builder.setPositiveButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                });
-                builder.setNegativeButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        FirebaseAuth.getInstance().signOut();
-                        Intent intent = getIntent();
-                        String action = intent.getStringExtra("Logout");
-                        GoogleSignInOptions options = new GoogleSignInOptions
-                                .Builder()
-                                .requestIdToken(getString(R.string.default_web_client_id))
-                                .requestEmail()
-                                .build();
-                        GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(getApplicationContext(),options);
 
-                        LoginManager.getInstance().logOut();
-                        googleSignInClient.signOut();
-                        startActivity(new Intent(ListChatActivity.this, LoginActivity.class));
-                        dialogInterface.dismiss();
-                    }
-                });
-                AlertDialog alertDialog = builder.create();
-                alertDialog.show();
             }
         });
 
@@ -132,6 +122,7 @@ public class ListChatActivity extends AppCompatActivity implements SearchView.On
         });
     }
 
+    @SuppressLint("ResourceAsColor")
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_listchat, menu);
@@ -155,9 +146,16 @@ public class ListChatActivity extends AppCompatActivity implements SearchView.On
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
         switch (item.getItemId()) {
             case R.id.add:
-
+                final FirebaseUser users = FirebaseAuth.getInstance().getCurrentUser();
+                Intent intent = new Intent(ListChatActivity.this,ActivityFriend.class);
+                intent.putExtra("idUser",users.getUid());
+                startActivity(intent);
+                break;
+            case R.id.logout:
+                Logout();
                 break;
         }
         return false;
@@ -165,17 +163,22 @@ public class ListChatActivity extends AppCompatActivity implements SearchView.On
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        adapter.getFilter().filter(query);
+
         return false;
     }
 
     @Override
     public boolean onQueryTextChange(String newText) {
+        if(newText.equals("")){
+            Toast.makeText(ListChatActivity.this, "Please enter to query !!",Toast.LENGTH_SHORT).show();
+        }
         adapter.getFilter().filter(newText);
         return false;
     }
 
+
     private void removeUser(){
+
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
 
             @Override
@@ -185,21 +188,55 @@ public class ListChatActivity extends AppCompatActivity implements SearchView.On
 
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                Drawable deleteDrawable = ContextCompat.getDrawable(ListChatActivity.this, R.drawable.ic_delete);
                 reference = FirebaseDatabase.getInstance().getReference("Users");
                 int position = viewHolder.getAdapterPosition();
                 final User deletedModel = userArrayList.get(position);
-                final int deletedPosition = position;
                 adapter.removeItem(position);
-                reference.child(deletedModel.getId()).setValue(null);
-                reference.child(deletedModel.getImage()+"").setValue(null);
-                reference.child(deletedModel.getUsername()+"").setValue(null);
+                try {
+                    reference.child(deletedModel.getId()).setValue(null);
+                    reference.child(deletedModel.getImage() + "").setValue(null);
+                    reference.child(deletedModel.getUsername() + "").setValue(null);
+                } catch (DatabaseException e) {
 
+                }
             }
+
 
         };
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
         itemTouchHelper.attachToRecyclerView(rcUser);
     }
+    private void Logout(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(ListChatActivity.this);
+        builder.setTitle("Do you want to log out ?");
+        builder.setPositiveButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        builder.setNegativeButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = getIntent();
+                String action = intent.getStringExtra("Logout");
+                GoogleSignInOptions options = new GoogleSignInOptions
+                        .Builder()
+                        .requestIdToken(getString(R.string.default_web_client_id))
+                        .requestEmail()
+                        .build();
+                GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(getApplicationContext(),options);
 
+                LoginManager.getInstance().logOut();
+                googleSignInClient.signOut();
+                startActivity(new Intent(ListChatActivity.this, LoginActivity.class));
+                dialogInterface.dismiss();
+            }
+        });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
 
 }

@@ -13,7 +13,7 @@ import android.widget.Filterable;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
+
 import com.dell.firebasechat.R;
 import com.dell.firebasechat.model.User;
 import com.dell.firebasechat.view.ChatActivity;
@@ -25,9 +25,10 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserHolder> implements Filterable {
 
-    List<User> users;
+    public  List<User> users;
     List<User> usersFilter;
     Context context;
+
 
 
     public UsersAdapter(Context context, List<User> users) {
@@ -65,20 +66,11 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserHolder> 
         return usersFilter.size();
     }
 
-    public User getUserPos(int position) {
-        return users.get(position);
-    }
 
     public void removeItem(int position) {
         users.remove(position);
         notifyItemRemoved(position);
         notifyItemRangeChanged(position, users.size());
-    }
-
-    public void restoreItem(User model, int position) {
-        users.add(position, model);
-        // notify item added by position
-        notifyItemInserted(position);
     }
 
     @Override
@@ -116,6 +108,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserHolder> 
         };
     }
 
+
     public class UserHolder extends RecyclerView.ViewHolder {
 
         CircleImageView igUser;
@@ -124,11 +117,10 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserHolder> 
 
         public UserHolder(View itemView) {
             super(itemView);
-            igUser = (CircleImageView) itemView.findViewById(R.id.igUserItem);
+            igUser = itemView.findViewById(R.id.igUserItem);
             tvUser = itemView.findViewById(R.id.tvItemUser);
-            linearLayout = (LinearLayout) itemView.findViewById(R.id.linea);
+            linearLayout = itemView.findViewById(R.id.linea);
         }
     }
-
 
 }

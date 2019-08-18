@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layoutchat"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="2dp"
-    android:id="@+id/layoutchat"
-    >
+    android:paddingTop="2dp">
 
     <TextView
         android:id="@+id/tvMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginRight="16dp"
-        android:background="@drawable/draw_chat_rigth"
+        android:background="@drawable/draw_chat_rigth4"
         android:maxWidth="240dp"
         android:padding="8dp"
         android:text="hello, hello!"

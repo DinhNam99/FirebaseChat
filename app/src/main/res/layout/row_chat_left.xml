@@ -36,7 +36,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="12dp"
-        android:background="@drawable/draw_chat_left"
+        android:background="@drawable/draw_chat_left4"
         android:maxWidth="240dp"
         android:padding="8dp"
         android:text="hi man, how are you?"
@@ -65,7 +65,6 @@
         android:layout_marginBottom="8dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/igFriend"
-        app:srcCompat="@drawable/com_facebook_favicon_blue" />
+        app:layout_constraintStart_toEndOf="@+id/igFriend" />
 
 </android.support.constraint.ConstraintLayout>
